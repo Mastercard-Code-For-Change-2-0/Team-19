@@ -193,7 +193,6 @@ const DonorRegister = () => {
                   id="aadhar"
                   label="Aadhar Number"
                   type="text"
-                  maxLength={12}
                   value={maskAadhar(formData.authValue)}
                   onChange={(value) => handleInputChange('authValue', value)}
                   placeholder="Enter 12-digit Aadhar number"
@@ -207,9 +206,8 @@ const DonorRegister = () => {
                   id="pan"
                   label="PAN Number"
                   type="text"
-                  maxLength={10}
                   value={formData.authValue}
-                  onChange={(value) => handleInputChange('authValue', value.toUpperCase())}
+                  onChange={(value) => handleInputChange('authValue', value.toUpperCase().slice(0, 10))}
                   placeholder="Enter 10-character PAN number"
                   required
                   error={errors.authValue}
