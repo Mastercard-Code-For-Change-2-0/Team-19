@@ -7,6 +7,8 @@ import { loginUser, setCurrentUser } from '@/utils/mockApi';
 import { validateEmail, validatePassword, combineValidationResults } from '@/utils/validations';
 import { useToast } from '@/hooks/use-toast';
 import { Users, ArrowLeft } from 'lucide-react';
+import axios from 'axios';
+
 
 const ReceiverLogin = () => {
   const [email, setEmail] = useState('');
@@ -34,19 +36,31 @@ const ReceiverLogin = () => {
 
     setIsLoading(true);
     try {
-      const user = await loginUser(email, password, 'receiver');
-      if (user) {
-        setCurrentUser(user);
-        toast({
-          title: 'Login Successful',
-          description: `Welcome back, ${user.name}!`,
-        });
-        navigate('/receiver/dashboard');
-      } else {
-        setErrors({ general: 'Invalid email or password' });
-      }
+      const response = await axios.post('http://localhost:5000/api/auth/login', {
+        email,
+        password,
+        role: 'receiver', // Role for this specific login
+      });
+
+      const { token, user } = response.data;
+
+      // Store token and user data (can also use Context API or Redux)
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+
+      toast({
+        title: 'Login Successful',
+        description: `Welcome back, ${user.name}!`,
+      });
+
+      navigate('/receiver/dashboard');
     } catch (error) {
-      setErrors({ general: 'An error occurred. Please try again.' });
+      // Handle error if login fails
+      if (error.response) {
+        setErrors({ general: error.response.data.msg || 'Invalid email or password' });
+      } else {
+        setErrors({ general: 'An error occurred. Please try again.' });
+      }
     } finally {
       setIsLoading(false);
     }

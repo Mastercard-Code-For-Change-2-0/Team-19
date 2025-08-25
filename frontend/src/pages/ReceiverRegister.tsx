@@ -7,6 +7,7 @@ import { registerUser, setCurrentUser } from '@/utils/mockApi';
 import { validateEmail, validatePassword, validateName } from '@/utils/validations';
 import { useToast } from '@/hooks/use-toast';
 import { Users, ArrowLeft } from 'lucide-react';
+import axios from 'axios';
 
 const ReceiverRegister = () => {
   const [formData, setFormData] = useState({
@@ -28,6 +29,7 @@ const ReceiverRegister = () => {
     e.preventDefault();
     setErrors({});
 
+    // Validate the fields
     const nameValidation = validateName(formData.name);
     const emailValidation = validateEmail(formData.email);
     const passwordValidation = validatePassword(formData.password);
@@ -38,6 +40,7 @@ const ReceiverRegister = () => {
     if (!emailValidation.isValid) newErrors.email = emailValidation.errors[0];
     if (!passwordValidation.isValid) newErrors.password = passwordValidation.errors[0];
     
+    // Check if passwords match
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
@@ -49,19 +52,34 @@ const ReceiverRegister = () => {
 
     setIsLoading(true);
     try {
-      const user = await registerUser(formData.email, formData.password, formData.name, 'receiver');
-      if (user) {
-        setCurrentUser(user);
-        toast({
-          title: 'Registration Successful',
-          description: `Welcome to DonationHub, ${user.name}!`,
-        });
-        navigate('/receiver/dashboard');
-      } else {
-        setErrors({ general: 'Registration failed. Please try again.' });
-      }
+      // Call the backend to register the receiver
+      const response = await axios.post('http://localhost:5000/api/auth/register', {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role: 'receiver',
+      });
+
+      const { token, user } = response.data;
+
+      // Store token and user data in localStorage or context
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+
+      // Show success toast and redirect to dashboard
+      toast({
+        title: 'Registration Successful',
+        description: `Welcome to DonationHub, ${user.name}!`,
+      });
+
+      navigate('/receiver/dashboard');
     } catch (error) {
-      setErrors({ general: 'An error occurred. Please try again.' });
+      // Handle error (e.g., show error message)
+      if (error.response) {
+        setErrors({ general: error.response.data.msg || 'Registration failed. Please try again.' });
+      } else {
+        setErrors({ general: 'An error occurred. Please try again.' });
+      }
     } finally {
       setIsLoading(false);
     }
