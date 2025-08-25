@@ -4,7 +4,7 @@ const auth = require("../middleware/authMiddleware");
 const router = express.Router();
 
 // Receiver creates request
-router.post("/", auth(["receiver"]), async (req, res) => {
+router.post("/post", auth(["receiver"]), async (req, res) => {
   try {
     const request = new Request({ ...req.body, receiverId: req.user.id });
     await request.save();

@@ -4,7 +4,7 @@ const auth = require("../middleware/authMiddleware");
 const router = express.Router();
 
 // Donor creates donation
-router.post("/", auth(["donor"]), async (req, res) => {
+router.post("/post", auth(["donor"]), async (req, res) => {
   try {
     const donation = new Donation({ ...req.body, donorId: req.user.id });
     await donation.save();
