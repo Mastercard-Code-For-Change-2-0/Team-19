@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const HistorySchema = new mongoose.Schema(
   {
@@ -37,4 +37,4 @@ const ReceiverSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("Receiver", ReceiverSchema);
+module.exports = mongoose.model("Receiver", ReceiverSchema);

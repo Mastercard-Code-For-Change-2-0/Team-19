@@ -1,9 +1,8 @@
-import mongoose from "mongoose";
-
+const mongoose = require("mongoose");
 const HistorySchema = new mongoose.Schema(
   {
     id: { type: String, required: true },
-    someToken: { type: String },
+    Token: { type: String },
     documentInfo: { type: String },
   },
   { _id: false }
@@ -25,10 +24,10 @@ const DonatorSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     verified: { type: Boolean, default: false },
     address: { type: String },
-    inNeed: [donateitems],
+    donates: [donateitems],
     history: [HistorySchema],
   },
   { timestamps: true }
 );
 
-export default mongoose.model("Donator", DonatorSchema);
+module.exports = mongoose.model("Donator", DonatorSchema);
